@@ -55,10 +55,15 @@ var Game = function() {
             console.log(that.currentWord.toString());
           } else {
             that.numberOfGuesses--;
-            console.log(
-              "Sorry, that's wrong. Guesses remaining: " + that.numberOfGuesses
-            );
-            console.log(that.currentWord.toString());
+            if (that.numberOfGuesses > 0) {
+              console.log(
+                "Sorry, that's wrong. Guesses remaining: " +
+                  that.numberOfGuesses
+              );
+              console.log(that.currentWord.toString());
+            } else {
+              console.log("You tried your best");
+            }
           }
         });
     }
