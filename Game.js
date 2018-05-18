@@ -6,7 +6,7 @@ const chalkAnimation = require("chalk-animation");
 
 var Game = function() {
   this.currentWord = "";
-
+  this.numberOfGuesses = 10;
   // play: starts the game track the guesses var guesses
   this.play = function() {
     var that = this;
@@ -23,39 +23,9 @@ var Game = function() {
           that.currentWord = that.wordPicker();
           while (that.currentWord !== null) {
             await that.displayWordPrompt();
-            // inquirer
-            //   .prompt([
-            //     {
-            //       name: "confirm",
-            //       type: "confirm",
-            //       message: "You guessed all the words! Want to play again?"
-            //     }
-            //   ])
-            //   .then(function(noYes) {
-            //     if (noYes.confirm) {
-            //       console.log("That's cool");
-            //     } else {
-            //       console.log("Okay! Goodbye!");
-            //     }
-            //   });
             that.currentWord = that.wordPicker();
-            if (that.currentWord === null) {
-              console.log("You did it! Game over.");
-              inquirer
-                .prompt([
-                  {
-                    name: "confirm",
-                    type: "confirm",
-                    message: "You guessed all the words! Want to play again?"
-                  }
-                ])
-                .then(function(noYes) {
-                  if (noYes.confirm) {
-                    console.log("That's cool");
-                  } else {
-                    console.log("Okay! Goodbye!");
-                  }
-                });
+            if (that.currentWord === null || this.numberOfGuesses === 0) {
+              console.log("Game over.");
             }
           }
         } else {
@@ -66,7 +36,11 @@ var Game = function() {
 
   this.displayWordPrompt = async function() {
     var that = this;
-    while (that.currentWord.toString().indexOf("_") !== -1) {
+
+    while (
+      that.currentWord.toString().indexOf("_") !== -1 &&
+      that.numberOfGuesses > 0
+    ) {
       await inquirer
         .prompt([
           {
@@ -76,9 +50,16 @@ var Game = function() {
           }
         ])
         .then(function(letterPrompt) {
-          console.log("Correct!");
-          that.currentWord.checkForLetter(letterPrompt.input);
-          console.log(that.currentWord.toString());
+          if (that.currentWord.checkForLetter(letterPrompt.input)) {
+            console.log("Correct!");
+            console.log(that.currentWord.toString());
+          } else {
+            that.numberOfGuesses--;
+            console.log(
+              "Sorry, that's wrong. Guesses remaining: " + that.numberOfGuesses
+            );
+            console.log(that.currentWord.toString());
+          }
         });
     }
   };
@@ -90,8 +71,6 @@ var Game = function() {
     var remainingWords = words.filter(function(word) {
       return !that.wordsGuessed.includes(word);
     });
-
-    console.log(remainingWords);
 
     if (remainingWords.length === 0) {
       return null;

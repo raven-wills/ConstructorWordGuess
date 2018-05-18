@@ -20,6 +20,7 @@ var Word = function(stringWord) {
     this.letterArray.forEach(function(letter) {
       letter.check(char);
     });
+    return this.toString().includes(char);
   };
 
   stringWord.split("").forEach(letter => this.addLetter(letter));
